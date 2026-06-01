@@ -117,6 +117,26 @@
     }
     .btn-remove:hover { background: hsl(var(--destructive) / 0.1); border-color: hsl(var(--destructive) / 0.5); color: hsl(var(--destructive)); }
 
+    .pace-card { margin-top: 1.5rem; text-align: left; }
+    .pace-card h2 { font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 0.4rem; }
+    .pace-sub { color: hsl(var(--muted-foreground)); font-weight: 600; font-size: 0.9rem; margin-top: 0.2rem; }
+
+    .pace-table { width: 100%; border-collapse: collapse; margin-top: 0.9rem; }
+    .pace-table th, .pace-table td { padding: 0.6rem 0.5rem; text-align: right; }
+    .pace-table th:first-child, .pace-table td:first-child { text-align: left; }
+    .pace-table thead th {
+      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em;
+      color: hsl(var(--muted-foreground)); font-weight: 800;
+      border-bottom: 2px solid hsl(var(--border));
+    }
+    .pace-table tbody tr { border-bottom: 1px solid hsl(var(--border)); }
+    .pace-table tbody tr:last-child { border-bottom: none; }
+    .pace-table .who { font-weight: 800; }
+    .pace-table tbody tr:first-child { color: hsl(var(--primary)); }
+    .pace-table tbody td:nth-child(2) { font-weight: 800; font-variant-numeric: tabular-nums; }
+    .pace-table tbody td:nth-child(3) { color: hsl(var(--muted-foreground)); font-variant-numeric: tabular-nums; }
+    .pace-note { margin-top: 0.85rem; font-size: 0.8rem; color: hsl(var(--muted-foreground)); font-weight: 600; }
+
     .recent-card { margin-top: 1.5rem; text-align: left; }
     .recent-card h2 { font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 0.4rem; }
 
@@ -181,6 +201,22 @@
       <div class="synced"><span class="dot"></span> Synced across all devices</div>
     </section>
 
+    <section class="card pace-card">
+      <h2>📊 Taco Pace</h2>
+      <p class="pace-sub">since "I do" — <span id="pace-weeks">…</span> weeks of marriage 💍</p>
+      <table class="pace-table">
+        <thead>
+          <tr><th>Who</th><th>Tacos / week</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="who">🌮 Together</span></td><td id="pace-together-wk">—</td><td id="pace-together-total">—</td></tr>
+          <tr><td><span class="who">👩 Amira</span></td><td id="pace-amira-wk">—</td><td id="pace-amira-total">—</td></tr>
+          <tr><td><span class="who">👨 Karan</span></td><td id="pace-karan-wk">—</td><td id="pace-karan-total">—</td></tr>
+        </tbody>
+      </table>
+      <p class="pace-note">Per-person is an even 50/50 split — just for fun 🌮💕</p>
+    </section>
+
     <section class="card recent-card">
       <h2>🌮 Recent Tacos</h2>
       <ul id="recent" class="recent-list">
@@ -206,7 +242,17 @@
       recent: document.getElementById('recent'),
       add: document.getElementById('add'),
       remove: document.getElementById('remove'),
+      paceWeeks: document.getElementById('pace-weeks'),
+      togetherWk: document.getElementById('pace-together-wk'),
+      togetherTotal: document.getElementById('pace-together-total'),
+      amiraWk: document.getElementById('pace-amira-wk'),
+      amiraTotal: document.getElementById('pace-amira-total'),
+      karanWk: document.getElementById('pace-karan-wk'),
+      karanTotal: document.getElementById('pace-karan-total'),
     };
+
+    // Married on Sep 8, 2018 — the "I do".
+    const MARRIED = new Date('2018-09-08T00:00:00');
 
     let counterId = null;
     let count = 0;
@@ -223,10 +269,24 @@
       els.count.textContent = count.toLocaleString();
       els.milestone.textContent = milestoneFor(count);
       els.remove.disabled = count <= 0;
+      renderPace();
       if (bump) {
         els.count.classList.add('bump');
         setTimeout(() => els.count.classList.remove('bump'), 180);
       }
+    }
+
+    function renderPace() {
+      const weeks = (Date.now() - MARRIED.getTime()) / (1000 * 60 * 60 * 24 * 7);
+      const perWeek = (n) => (n / weeks).toFixed(2);
+      const each = count / 2;
+      els.paceWeeks.textContent = Math.floor(weeks).toLocaleString();
+      els.togetherWk.textContent = perWeek(count);
+      els.togetherTotal.textContent = count.toLocaleString();
+      els.amiraWk.textContent = perWeek(each);
+      els.amiraTotal.textContent = each.toLocaleString(undefined, { maximumFractionDigits: 1 });
+      els.karanWk.textContent = perWeek(each);
+      els.karanTotal.textContent = each.toLocaleString(undefined, { maximumFractionDigits: 1 });
     }
 
     function formatWhen(iso) {
