@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amira &amp; Karan's Taco Tracker 🌮</title>
+  <meta name="description" content="Because every taco counts 💕 — Amira & Karan's taco tracker." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌮</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --background: 36 33% 97%;
+      --foreground: 20 20% 20%;
+      --card: 36 40% 95%;
+      --primary: 16 85% 60%;      /* taco orange */
+      --primary-foreground: 36 33% 97%;
+      --secondary: 45 90% 65%;    /* taco yellow */
+      --accent: 145 50% 45%;      /* taco green  */
+      --destructive: 0 84.2% 60.2%;
+      --muted-foreground: 20 10% 50%;
+      --border: 30 20% 85%;
+      --radius: 1rem;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', system-ui, sans-serif;
+      color: hsl(var(--foreground));
+      background:
+        radial-gradient(circle at 15% 15%, hsl(var(--secondary) / 0.25), transparent 45%),
+        radial-gradient(circle at 85% 25%, hsl(var(--primary) / 0.18), transparent 45%),
+        radial-gradient(circle at 50% 90%, hsl(var(--accent) / 0.15), transparent 50%),
+        hsl(var(--background));
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .app { width: 100%; max-width: 30rem; text-align: center; }
+
+    .hero-emojis { font-size: 3rem; letter-spacing: 0.25rem; line-height: 1; margin-bottom: 0.75rem; }
+
+    h1 {
+      font-size: clamp(1.75rem, 6vw, 2.5rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)), hsl(var(--accent)));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1.1;
+    }
+
+    .tagline { color: hsl(var(--muted-foreground)); font-weight: 600; margin-top: 0.4rem; }
+
+    .card {
+      background: hsl(var(--card));
+      border: 2px solid hsl(var(--border));
+      border-radius: var(--radius);
+      box-shadow: 0 12px 40px -12px hsl(var(--primary) / 0.35);
+      padding: 2rem 1.5rem;
+    }
+
+    .counter-card { margin-top: 1.75rem; }
+
+    .count {
+      font-size: clamp(4rem, 22vw, 6.5rem);
+      font-weight: 900;
+      line-height: 1;
+      color: hsl(var(--primary));
+      transition: transform 0.18s ease;
+    }
+    .count.bump { transform: scale(1.12); }
+
+    .count-label { font-weight: 700; color: hsl(var(--foreground)); margin-top: 0.25rem; }
+
+    .milestone {
+      margin-top: 1rem;
+      font-weight: 800;
+      color: hsl(var(--accent));
+      min-height: 1.5em;
+    }
+
+    .buttons { display: flex; gap: 0.9rem; justify-content: center; margin-top: 1.75rem; }
+
+    button {
+      font-family: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      border-radius: 999px;
+      border: 2px solid transparent;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+      user-select: none;
+    }
+    button:active { transform: scale(0.94); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-add {
+      font-size: 1.6rem;
+      padding: 0.7rem 2.4rem;
+      color: hsl(var(--primary-foreground));
+      background: linear-gradient(135deg, hsl(var(--primary)), hsl(16 85% 52%));
+      box-shadow: 0 8px 20px -6px hsl(var(--primary) / 0.7);
+    }
+    .btn-add:hover { box-shadow: 0 10px 26px -6px hsl(var(--primary) / 0.85); }
+
+    .btn-remove {
+      font-size: 1.4rem;
+      padding: 0.7rem 1.5rem;
+      color: hsl(var(--foreground));
+      background: transparent;
+      border-color: hsl(var(--border));
+    }
+    .btn-remove:hover { background: hsl(var(--destructive) / 0.1); border-color: hsl(var(--destructive) / 0.5); color: hsl(var(--destructive)); }
+
+    .recent-card { margin-top: 1.5rem; text-align: left; }
+    .recent-card h2 { font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 0.4rem; }
+
+    .recent-list { list-style: none; margin-top: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .recent-list li {
+      display: flex; align-items: center; gap: 0.6rem;
+      background: hsl(var(--background));
+      border: 1px solid hsl(var(--border));
+      border-radius: 0.75rem;
+      padding: 0.55rem 0.8rem;
+      font-weight: 600;
+    }
+    .recent-list li .emoji { font-size: 1.2rem; }
+    .recent-list li .time { color: hsl(var(--muted-foreground)); font-size: 0.9rem; }
+    .recent-empty { color: hsl(var(--muted-foreground)); font-weight: 600; padding: 0.5rem 0; }
+
+    .synced {
+      margin-top: 1rem; font-size: 0.85rem; font-weight: 700;
+      color: hsl(var(--accent));
+      display: inline-flex; align-items: center; gap: 0.4rem;
+    }
+    .synced .dot {
+      width: 0.55rem; height: 0.55rem; border-radius: 50%;
+      background: hsl(var(--accent));
+      box-shadow: 0 0 0 0 hsl(var(--accent) / 0.6);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 hsl(var(--accent) / 0.5); }
+      70% { box-shadow: 0 0 0 0.5rem hsl(var(--accent) / 0); }
+      100% { box-shadow: 0 0 0 0 hsl(var(--accent) / 0); }
+    }
+
+    footer { margin-top: 1.75rem; color: hsl(var(--muted-foreground)); font-weight: 700; }
+
+    /* floating taco confetti on +1 */
+    .confetti {
+      position: fixed; font-size: 1.8rem; pointer-events: none; z-index: 50;
+      animation: float-up 1s ease-out forwards;
+    }
+    @keyframes float-up {
+      0% { transform: translateY(0) scale(0.6); opacity: 0; }
+      20% { opacity: 1; }
+      100% { transform: translateY(-120px) scale(1.4) rotate(20deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="hero-emojis">🌮 🌶️ 🥑</div>
+    <h1>Amira &amp; Karan's Taco Tracker</h1>
+    <p class="tagline">Because every taco counts 💕</p>
+
+    <section class="card counter-card">
+      <div id="count" class="count">—</div>
+      <div class="count-label">tacos since "I do" 🌮💕</div>
+      <div id="milestone" class="milestone"></div>
+      <div class="buttons">
+        <button id="remove" class="btn-remove" aria-label="Remove a taco" disabled>−1</button>
+        <button id="add" class="btn-add" aria-label="Add a taco" disabled>+1</button>
+      </div>
+      <div class="synced"><span class="dot"></span> Synced across all devices</div>
+    </section>
+
+    <section class="card recent-card">
+      <h2>🌮 Recent Tacos</h2>
+      <ul id="recent" class="recent-list">
+        <li class="recent-empty">Loading…</li>
+      </ul>
+    </section>
+
+    <footer>Made with 🌮 &amp; love</footer>
+  </main>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    // Public Supabase project (anon key — safe to expose; protected by Row Level Security).
+    const SUPABASE_URL = 'https://wlxrtoblvodipwvzymfg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndseHJ0b2Jsdm9kaXB3dnp5bWZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4ODExNTUsImV4cCI6MjA4MDQ1NzE1NX0.vELx0RW36ccKkzOsiugzhVophBvmTAeu9mvhsLPr0e0';
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const els = {
+      count: document.getElementById('count'),
+      milestone: document.getElementById('milestone'),
+      recent: document.getElementById('recent'),
+      add: document.getElementById('add'),
+      remove: document.getElementById('remove'),
+    };
+
+    let counterId = null;
+    let count = 0;
+
+    function milestoneFor(t) {
+      if (t < 100) return 'Just getting warmed up! Keep munching! 🌮';
+      if (t < 500) return "Now we're talking! Taco power couple! 💪";
+      if (t < 1000) return "Wow! That's some serious taco dedication! 🏆";
+      if (t < 2000) return 'Legendary taco lovers! You two are goals! 👑';
+      return 'TACO ROYALTY! You’ve ascended to a higher plane! 🌮👑✨';
+    }
+
+    function renderCount(bump) {
+      els.count.textContent = count.toLocaleString();
+      els.milestone.textContent = milestoneFor(count);
+      els.remove.disabled = count <= 0;
+      if (bump) {
+        els.count.classList.add('bump');
+        setTimeout(() => els.count.classList.remove('bump'), 180);
+      }
+    }
+
+    function formatWhen(iso) {
+      const d = new Date(iso);
+      const date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      return `${date} at ${time}`;
+    }
+
+    function renderRecent(rows) {
+      if (!rows || rows.length === 0) {
+        els.recent.innerHTML = '<li class="recent-empty">No tacos logged yet — add your first! 🌮</li>';
+        return;
+      }
+      els.recent.innerHTML = rows.map(r =>
+        `<li><span class="emoji">🌮</span><span class="time">${formatWhen(r.added_at)}</span></li>`
+      ).join('');
+    }
+
+    function confetti() {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.textContent = '🌮';
+      c.style.left = (els.add.getBoundingClientRect().left + 20) + 'px';
+      c.style.top = (els.add.getBoundingClientRect().top - 10) + 'px';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 1000);
+    }
+
+    async function loadCounter() {
+      const { data } = await supabase.from('taco_counter').select('*').limit(1).single();
+      if (data) { counterId = data.id; count = data.count; renderCount(); }
+    }
+
+    async function loadRecent() {
+      const { data } = await supabase.from('taco_log').select('*').order('added_at', { ascending: false }).limit(5);
+      renderRecent(data);
+    }
+
+    async function addTaco() {
+      if (!counterId) return;
+      count += 1; renderCount(true); confetti();
+      await supabase.from('taco_counter').update({ count, updated_at: new Date().toISOString() }).eq('id', counterId);
+      await supabase.from('taco_log').insert({});
+      loadRecent();
+    }
+
+    async function removeTaco() {
+      if (!counterId || count <= 0) return;
+      // The taco_log is append-only (delete is blocked by RLS), matching the
+      // original app — so −1 only adjusts the counter, it doesn't remove a log row.
+      count -= 1; renderCount(true);
+      await supabase.from('taco_counter').update({ count, updated_at: new Date().toISOString() }).eq('id', counterId);
+    }
+
+    els.add.addEventListener('click', addTaco);
+    els.remove.addEventListener('click', removeTaco);
+
+    // Realtime cross-device sync.
+    supabase.channel('taco-counter-updates')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'taco_counter' }, (payload) => {
+        if (payload.new && typeof payload.new.count === 'number') { count = payload.new.count; renderCount(true); }
+      })
+      .subscribe();
+
+    supabase.channel('taco-log-updates')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'taco_log' }, () => loadRecent())
+      .subscribe();
+
+    // Initial load.
+    (async () => {
+      await Promise.all([loadCounter(), loadRecent()]);
+      els.add.disabled = false;
+      els.remove.disabled = count <= 0;
+    })();
+  </script>
+</body>
+</html>
